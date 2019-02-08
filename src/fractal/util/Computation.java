@@ -4,6 +4,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.BlockingQueue;
+import java.util.concurrent.Callable;
 
 import fractal.model.Area;
 import fractal.model.BinaryNode;
@@ -12,7 +13,7 @@ import fractal.model.Coordinate;
 import fractal.model.Variable;
 import javafx.util.Pair;
 
-public class Computation implements Runnable {
+public class Computation implements Callable<Map<Coordinate, Double>> {
 	
 	private long maxIteration;
 	private String equation;
@@ -22,9 +23,8 @@ public class Computation implements Runnable {
 	private Area poisonPill;
 	
 	BlockingQueue<Area> in;
-	BlockingQueue<Map<Coordinate, Double>> out;
 	
-	public Computation(int width, int height, long maxIteration, String equation, List<Variable> variableList, BlockingQueue<Area> requests, BlockingQueue<Map<Coordinate, Double>> replies, Area poisonPill) {
+	public Computation(int width, int height, long maxIteration, String equation, List<Variable> variableList, BlockingQueue<Area> requests, Area poisonPill) {
 		this.maxIteration = maxIteration;
 		this.equation = equation;
 		this.variableList = variableList;
@@ -33,41 +33,8 @@ public class Computation implements Runnable {
 		this.poisonPill = poisonPill;
 		
 		this.in = requests;
-		this.out = replies;
 	}
-	
-	@Override
-	public void run() {
-		try {
-			while(true) {
-				Area area = in.take();
-				
-				if (area.equals(poisonPill)) {
-					return;
-				}
-				List<Coordinate> coordList = area.getCoordinates();
-				HashMap<Coordinate, Double> areaIteration = new HashMap<>();
-			
-				for (Coordinate toCompute : coordList) {
-					System.out.println(Thread.currentThread().getName()+" Start. coordinate = " + toCompute.getX() + "," + toCompute.getY());
-					//Pair<Coordinate, Double> reply = computeIteration(maxIteration, equation, variableList, toCompute);
-					//areaIteration.put(reply.getKey(), reply.getValue());
-				}
-			
-				/*try {
-					out.put(areaIteration);
-				} catch (InterruptedException e) {
-					throw new RuntimeException(e);
-				}
-				 */
-				//System.out.println(Thread.currentThread().getName()+" End.");
-			}
-			
-		} catch (InterruptedException e) {
-			throw new RuntimeException(e);
-		}
-	}
-	
+		
 	private Pair<Coordinate, Double> computeIteration(long maxIteration, String equation, List<Variable> variableList, Coordinate current) {
 		Map<String,ComplexNumber> variables = new HashMap<>();
 
@@ -105,6 +72,36 @@ public class Computation implements Runnable {
 		Pair<Coordinate, Double> reply = new Pair<>(current, iteration);
 		
 		return reply;
+	}
+
+	@Override
+	public Map<Coordinate, Double> call() throws Exception {
+		try {
+			HashMap<Coordinate, Double> areaIteration = new HashMap<>();
+			
+			while(true) {
+				Area area = in.take();
+				
+				List<Coordinate> coordList = area.getCoordinates();
+				
+				if (area.equals(poisonPill)) {
+					System.out.println(Thread.currentThread().getName());
+					System.out.println("poisonPill received!");
+					System.out.println("areaIteration size: " + areaIteration.size());
+					return areaIteration;
+				}
+			
+				for (Coordinate toCompute : coordList) {
+					//System.out.println(Thread.currentThread().getName() + " Start. coordinate = " + toCompute.getX() + "," + toCompute.getY());
+					Pair<Coordinate, Double> reply = computeIteration(maxIteration, equation, variableList, toCompute);
+					//System.out.println("Coordinate: " + reply.getKey() + " Double: " + reply.getValue());
+					areaIteration.put(reply.getKey(), reply.getValue());
+				}
+			}
+			
+		} catch (InterruptedException e) {
+			throw new RuntimeException(e);
+		}
 	}
 
 }

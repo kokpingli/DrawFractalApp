@@ -1,12 +1,15 @@
 package fractal.util;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.concurrent.BlockingQueue;
+import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
 import java.util.concurrent.LinkedBlockingDeque;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.TimeUnit;
@@ -73,44 +76,45 @@ public class Dispatcher implements Runnable {
 	private void beginComputation() {
 		
 		int BOUND = 10;
-		int N_PRODUCERS = 4;
+		//int N_PRODUCERS = 4;
+		int N_PRODUCERS = 1;
 		int N_CONSUMERS = Runtime.getRuntime().availableProcessors();
 		int id = Integer.MAX_VALUE;
 		Area poisonPill = new Area(id, new Coordinate(Integer.MAX_VALUE, Integer.MAX_VALUE), 0, 0);
-		//Integer poisonPill = Integer.MAX_VALUE;
 		int poisonPillPerProducer = N_CONSUMERS / N_PRODUCERS;
 		int mod = N_CONSUMERS % N_PRODUCERS;
 		
 		BlockingQueue<Area> requests = new LinkedBlockingQueue<>(BOUND);
-		//BlockingQueue<Integer> requests = new LinkedBlockingQueue<>(BOUND);
-		//BlockingQueue<Map<Coordinate, Double>> reply = new LinkedBlockingDeque<>();
+		BlockingQueue<Map<Coordinate, Double>> reply = new LinkedBlockingDeque<>();
 		
-		for (int i = 1; i < N_PRODUCERS; ++i) {
-			new Thread(new AreasProducer(gc, requests, poisonPill, poisonPillPerProducer)).start();
-		}
+		//for (int i = 1; i < N_PRODUCERS; ++i) {
+		//	new Thread(new AreasProducer(gc, requests, poisonPill, poisonPillPerProducer)).start();
+		//}
+		new Thread(new AreasProducer(gc, requests, poisonPill, poisonPillPerProducer+mod)).start();
+		
+		ExecutorService executor = Executors.newFixedThreadPool(N_CONSUMERS);
+		List<Computation> computationList = new ArrayList<>();
 		
 		for (int j = 0; j < N_CONSUMERS; ++j) {
-			new Thread(new AreasConsumer(requests, poisonPill)).start();
-			//new Thread(new Computation(width, height, maxIteration, equationField, variableData, requests, reply, poisonPill)).start();
+			Computation computation = new Computation(width, height, maxIteration, equationField, variableData, requests, poisonPill);
+			computationList.add(computation);
+		}	
+			
+		try {
+			List<Future<Map<Coordinate,Double>>> future = executor.invokeAll(computationList);
+		} catch (InterruptedException e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
 		}
 		
-		new Thread(new AreasProducer(gc, requests, poisonPill, poisonPillPerProducer+mod)).start();
-		//BlockingQueue<Area> requests = new LinkedBlockingDeque<>(BOUND);
-        //BlockingQueue<Map<Coordinate, Double>> reply = new LinkedBlockingDeque<>();
-		
-		// create a thread pool of size 10
-/*		ExecutorService executor = Executors.newFixedThreadPool(4);
-		//ExecutorService executor = Executors.newCachedThreadPool();
+		//new Thread(new AreasProducer(gc, requests, poisonPill, poisonPillPerProducer+mod)).start();	
+/*		
 			
 		Coordinate nextCoord = null;
 		
 		double xCoord = 0.0;
 		double yCoord = 0.0;
-		int areaWidth = 10;
-		int areaHeight = 10;
 		
-		int trialWidth = 100;
-		int trialHeight = 100;
 		//for (yCoord = 0.0; yCoord < height; ++yCoord) {
 		//	for (xCoord = 0.0; xCoord < width; ++xCoord) {
 		for (yCoord = 0.0; yCoord < trialHeight; yCoord += areaHeight) {
@@ -131,7 +135,13 @@ public class Dispatcher implements Runnable {
 */
 		// queue test end
 		//return replies;
-		/*double counter = (trialHeight * trialWidth) / (areaWidth * areaHeight);
+/*		int areaWidth = 10;
+		int areaHeight = 10;
+		
+		int trialWidth = 100;
+		int trialHeight = 100;
+		
+		double counter = (trialHeight * trialWidth) / (areaWidth * areaHeight);
 		while (counter != 0) {
 			if (!reply.isEmpty()) {
 				try {
@@ -150,16 +160,17 @@ public class Dispatcher implements Runnable {
 				counter--;
 			}
 		}
+*/
 		
 		executor.shutdown();
 		try {
-			if (!executor.awaitTermination(800, TimeUnit.MILLISECONDS))
+			if (!executor.awaitTermination(30000, TimeUnit.MILLISECONDS))
 				executor.shutdownNow();
 		} catch (InterruptedException e) {
 			executor.shutdownNow();
 		}
 		System.out.println("executor is shut down!");
-		*/
+
 	}
 
 }
