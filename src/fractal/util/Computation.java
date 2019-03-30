@@ -4,7 +4,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.BlockingQueue;
-import java.util.concurrent.Callable;
+import java.util.function.Supplier;
 
 import fractal.model.Area;
 import fractal.model.BinaryNode;
@@ -13,7 +13,7 @@ import fractal.model.Coordinate;
 import fractal.model.Variable;
 import javafx.util.Pair;
 
-public class Computation implements Callable<Map<Coordinate, Double>> {
+public class Computation implements Supplier<Map<Coordinate, Double>> {	
 	
 	private long maxIteration;
 	private String equation;
@@ -75,14 +75,16 @@ public class Computation implements Callable<Map<Coordinate, Double>> {
 	}
 
 	@Override
-	public Map<Coordinate, Double> call() throws Exception {
+	public Map<Coordinate, Double> get() {
 		try {
 			HashMap<Coordinate, Double> areaIteration = new HashMap<>();
 			
 			while(true) {
 				Area area = in.take();
+				System.out.println("area: " + area.getId());
 				
 				List<Coordinate> coordList = area.getCoordinates();
+				//System.out.println("startCoord: " + coordList.get(0));
 				
 				if (area.equals(poisonPill)) {
 					System.out.println(Thread.currentThread().getName());

@@ -1,22 +1,22 @@
 package fractal.util;
 
-import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.concurrent.BlockingQueue;
-import java.util.concurrent.ExecutionException;
+import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
-import java.util.concurrent.Future;
 import java.util.concurrent.LinkedBlockingDeque;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.TimeUnit;
 
 import fractal.MainApp;
 import fractal.model.Area;
+import fractal.model.Caretaker;
 import fractal.model.Coordinate;
+import fractal.model.Memento;
+import fractal.model.Originator;
 import fractal.model.Variable;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.control.TextField;
@@ -76,9 +76,9 @@ public class Dispatcher implements Runnable {
 	private void beginComputation() {
 		
 		int BOUND = 10;
-		//int N_PRODUCERS = 4;
 		int N_PRODUCERS = 1;
-		int N_CONSUMERS = Runtime.getRuntime().availableProcessors();
+		//int N_CONSUMERS = Runtime.getRuntime().availableProcessors();
+		int N_CONSUMERS = 25;
 		int id = Integer.MAX_VALUE;
 		Area poisonPill = new Area(id, new Coordinate(Integer.MAX_VALUE, Integer.MAX_VALUE), 0, 0);
 		int poisonPillPerProducer = N_CONSUMERS / N_PRODUCERS;
@@ -87,27 +87,20 @@ public class Dispatcher implements Runnable {
 		BlockingQueue<Area> requests = new LinkedBlockingQueue<>(BOUND);
 		BlockingQueue<Map<Coordinate, Double>> reply = new LinkedBlockingDeque<>();
 		
-		//for (int i = 1; i < N_PRODUCERS; ++i) {
-		//	new Thread(new AreasProducer(gc, requests, poisonPill, poisonPillPerProducer)).start();
-		//}
 		new Thread(new AreasProducer(gc, requests, poisonPill, poisonPillPerProducer+mod)).start();
 		
 		ExecutorService executor = Executors.newFixedThreadPool(N_CONSUMERS);
-		List<Computation> computationList = new ArrayList<>();
+
+		Caretaker caretaker = new Caretaker();
+		Originator originator = new Originator();
 		
 		for (int j = 0; j < N_CONSUMERS; ++j) {
 			Computation computation = new Computation(width, height, maxIteration, equationField, variableData, requests, poisonPill);
-			computationList.add(computation);
-		}	
+			CompletableFuture<Map<Coordinate,Double>> getIterations = CompletableFuture.supplyAsync(computation, executor);
+			CompletableFuture<Memento> savedMementos = getIterations.thenApply(originator.store);
 			
-		try {
-			List<Future<Map<Coordinate,Double>>> future = executor.invokeAll(computationList);
-		} catch (InterruptedException e1) {
-			// TODO Auto-generated catch block
-			e1.printStackTrace();
-		}
-		
-		//new Thread(new AreasProducer(gc, requests, poisonPill, poisonPillPerProducer+mod)).start();	
+			savedMementos.thenAccept(caretaker);
+		}	
 /*		
 			
 		Coordinate nextCoord = null;
@@ -172,5 +165,4 @@ public class Dispatcher implements Runnable {
 		System.out.println("executor is shut down!");
 
 	}
-
 }

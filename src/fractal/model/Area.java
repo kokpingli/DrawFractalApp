@@ -37,7 +37,7 @@ public class Area implements Display {
 		return id;
 	}
 	
-	/*@Override
+	@Override
 	public boolean equals(Object o) {
 		if (this == o) return true;
 		if (o == null || getClass() != o.getClass()) return false;
@@ -48,7 +48,7 @@ public class Area implements Display {
 	public int hashcode() {
 		return id;
 	}
-	*/
+	
 	@Override
 	public Map<Coordinate, Long> computeIteration() {
 		// TODO Auto-generated method stub
