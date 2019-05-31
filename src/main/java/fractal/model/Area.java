@@ -50,7 +50,7 @@ public class Area implements Display {
 	}
 	
 	@Override
-	public Map<Coordinate, Long> computeIteration() {
+	public Map<Coordinate, Long> setIterations() {
 		// TODO Auto-generated method stub
 		return null;
 	}

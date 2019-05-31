@@ -40,7 +40,7 @@ public class MainApp extends Application {
 	private void showFractalOverview() {
 		try {
 			FXMLLoader loader = new FXMLLoader();
-			loader.setLocation(MainApp.class.getResource("view/FractalOverview.fxml"));
+			loader.setLocation(MainApp.class.getResource("../FractalOverview.fxml"));
 			AnchorPane fractalOverview = (AnchorPane) loader.load();
 			
 			FractalOverviewController controller = loader.getController();
@@ -58,7 +58,7 @@ public class MainApp extends Application {
 	public boolean showVariableEditDialog() {
 		try {
 			FXMLLoader loader = new FXMLLoader();
-			loader.setLocation(MainApp.class.getResource("view/VariableEditDialog.fxml"));
+			loader.setLocation(MainApp.class.getResource("../VariableEditDialog.fxml"));
 			AnchorPane page = (AnchorPane) loader.load();
 			
 			Stage dialogStage = new Stage();

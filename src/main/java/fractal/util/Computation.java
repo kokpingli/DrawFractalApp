@@ -20,17 +20,18 @@ public class Computation implements Supplier<Map<Coordinate, Double>> {
 	private List<Variable> variableList;
 	private int width;
 	private int height;
-	private Area poisonPill;
+	//private Area poisonPill;
 	
 	BlockingQueue<Area> in;
 	
-	public Computation(int width, int height, long maxIteration, String equation, List<Variable> variableList, BlockingQueue<Area> requests, Area poisonPill) {
+	//public Computation(int width, int height, long maxIteration, String equation, List<Variable> variableList, BlockingQueue<Area> requests, Area poisonPill) {
+	public Computation(int width, int height, long maxIteration, String equation, List<Variable> variableList, BlockingQueue<Area> requests) {
 		this.maxIteration = maxIteration;
 		this.equation = equation;
 		this.variableList = variableList;
 		this.width = width;
 		this.height = height;
-		this.poisonPill = poisonPill;
+		//this.poisonPill = poisonPill;
 		
 		this.in = requests;
 	}
@@ -79,19 +80,19 @@ public class Computation implements Supplier<Map<Coordinate, Double>> {
 		try {
 			HashMap<Coordinate, Double> areaIteration = new HashMap<>();
 			
-			while(true) {
+			//while(true) {
 				Area area = in.take();
 				System.out.println("area: " + area.getId());
 				
 				List<Coordinate> coordList = area.getCoordinates();
 				//System.out.println("startCoord: " + coordList.get(0));
 				
-				if (area.equals(poisonPill)) {
-					System.out.println(Thread.currentThread().getName());
-					System.out.println("poisonPill received!");
-					System.out.println("areaIteration size: " + areaIteration.size());
-					return areaIteration;
-				}
+				//if (area.equals(poisonPill)) {
+				//	System.out.println(Thread.currentThread().getName());
+				//	System.out.println("poisonPill received!");
+				//	System.out.println("areaIteration size: " + areaIteration.size());
+				//	return areaIteration;
+				//}
 			
 				for (Coordinate toCompute : coordList) {
 					//System.out.println(Thread.currentThread().getName() + " Start. coordinate = " + toCompute.getX() + "," + toCompute.getY());
@@ -99,11 +100,12 @@ public class Computation implements Supplier<Map<Coordinate, Double>> {
 					//System.out.println("Coordinate: " + reply.getKey() + " Double: " + reply.getValue());
 					areaIteration.put(reply.getKey(), reply.getValue());
 				}
-			}
-			
+			//}
+				return areaIteration;
 		} catch (InterruptedException e) {
 			throw new RuntimeException(e);
 		}
+		
 	}
 
 }

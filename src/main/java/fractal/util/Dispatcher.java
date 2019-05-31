@@ -62,32 +62,22 @@ public class Dispatcher implements Runnable {
 	public void run() {
 		beginComputation();
 	}
-	
-	private void updateArray(Map<Coordinate, Double> reply) {
-		for (Entry<Coordinate, Double> entry : reply.entrySet()) {
-			Coordinate coordinate = entry.getKey();
-			Double iteration = entry.getValue();
-			// TO DELETE - will implement create snapshot
-			setNumIteration(coordinate, iteration);
-		}
-		
-	}
 
 	private void beginComputation() {
 		
 		int BOUND = 10;
 		int N_PRODUCERS = 1;
-		//int N_CONSUMERS = Runtime.getRuntime().availableProcessors();
-		int N_CONSUMERS = 25;
+		int N_CONSUMERS = Runtime.getRuntime().availableProcessors() * 2;
+		//int N_CONSUMERS = 25;
 		int id = Integer.MAX_VALUE;
 		Area poisonPill = new Area(id, new Coordinate(Integer.MAX_VALUE, Integer.MAX_VALUE), 0, 0);
-		int poisonPillPerProducer = N_CONSUMERS / N_PRODUCERS;
-		int mod = N_CONSUMERS % N_PRODUCERS;
+		//int poisonPillPerProducer = N_CONSUMERS / N_PRODUCERS;
+		//int mod = N_CONSUMERS % N_PRODUCERS;
 		
 		BlockingQueue<Area> requests = new LinkedBlockingQueue<>(BOUND);
-		BlockingQueue<Map<Coordinate, Double>> reply = new LinkedBlockingDeque<>();
 		
-		new Thread(new AreasProducer(gc, requests, poisonPill, poisonPillPerProducer+mod)).start();
+		//new Thread(new AreasProducer(gc, requests, poisonPill, poisonPillPerProducer+mod)).start();
+		new Thread(new AreasProducer(gc, requests)).start();
 		
 		ExecutorService executor = Executors.newFixedThreadPool(N_CONSUMERS);
 
@@ -95,65 +85,26 @@ public class Dispatcher implements Runnable {
 		Originator originator = new Originator();
 		
 		for (int j = 0; j < N_CONSUMERS; ++j) {
-			Computation computation = new Computation(width, height, maxIteration, equationField, variableData, requests, poisonPill);
+			//Computation computation = new Computation(width, height, maxIteration, equationField, variableData, requests, poisonPill);
+			Computation computation = new Computation(width, height, maxIteration, equationField, variableData, requests);
 			CompletableFuture<Map<Coordinate,Double>> getIterations = CompletableFuture.supplyAsync(computation, executor);
 			CompletableFuture<Memento> savedMementos = getIterations.thenApply(originator.store);
 			
 			savedMementos.thenAccept(caretaker);
-		}	
-/*		
-			
-		Coordinate nextCoord = null;
-		
-		double xCoord = 0.0;
-		double yCoord = 0.0;
-		
-		//for (yCoord = 0.0; yCoord < height; ++yCoord) {
-		//	for (xCoord = 0.0; xCoord < width; ++xCoord) {
-		for (yCoord = 0.0; yCoord < trialHeight; yCoord += areaHeight) {
-			for (xCoord = 0.0; xCoord < trialWidth; xCoord += areaWidth) {
-				nextCoord = new Coordinate(xCoord, yCoord);
-				try {
-					Computation computation = new Computation(width, height, maxIteration, equationField, variableData, requests, reply);
-					executor.execute(computation);
-					Area area = new Area(nextCoord, areaWidth, areaHeight);
-					//requests.add(area);
-					requests.put(area);
-				} catch (InterruptedException e) {
-				//} catch (IllegalStateException e) {
-					throw new RuntimeException(e);
-				}
-			}
 		}
-*/
-		// queue test end
-		//return replies;
-/*		int areaWidth = 10;
-		int areaHeight = 10;
 		
-		int trialWidth = 100;
-		int trialHeight = 100;
-		
-		double counter = (trialHeight * trialWidth) / (areaWidth * areaHeight);
-		while (counter != 0) {
-			if (!reply.isEmpty()) {
-				try {
-					System.out.println(Thread.currentThread().getName()+" Starts.");
-					// just for testing
-					Map<Coordinate, Double> items = new HashMap<>();
-					items = reply.take();
-
-			        items.forEach((k,v)->System.out.println("Item : " + k + " Count : " + v));
-			        System.out.println(Thread.currentThread().getName()+" Ends.");
-			        // just for testing ends here
-					//updateArray(reply.take());
-				} catch (InterruptedException e) {
-					throw new RuntimeException(e);
-				}
-				counter--;
-			}
-		}
-*/
+		// get snapshot after savedMementos
+//		for (int j = 0; j < 10; ++j) {
+//			Map<Coordinate, Double> snapshot = originator.restoreFromMemento(caretaker.getMemento(j));
+//			
+//			//theArticle.setText(textBoxString);
+//			for (Entry<Coordinate, Double> entry : snapshot.entrySet()) {
+//				Coordinate coordinate = entry.getKey();
+//				Double iteration = entry.getValue();
+//				System.out.println("iteration: " + iteration);
+//				setNumIteration(coordinate, iteration);
+//			}
+//		}
 		
 		executor.shutdown();
 		try {
