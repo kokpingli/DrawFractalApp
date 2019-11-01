@@ -7,9 +7,9 @@
 <?import javafx.scene.layout.*?>
 <?import javafx.scene.layout.AnchorPane?>
 
-<AnchorPane maxHeight="320.0" minHeight="150.0" prefHeight="320.0" prefWidth="400.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="fractal.view.VariableEditDialogController">
+<AnchorPane maxHeight="320.0" minHeight="150.0" prefHeight="153.0" prefWidth="400.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="fractal.view.VariableEditDialogController">
    <children>
-      <HBox alignment="CENTER_RIGHT" layoutY="280.0" prefHeight="40.0" prefWidth="400.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="280.0">
+      <HBox alignment="CENTER_RIGHT" layoutY="113.0" prefHeight="41.0" prefWidth="400.0" AnchorPane.bottomAnchor="-1.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="113.0">
          <children>
             <Button mnemonicParsing="false" onAction="#handleOK" prefWidth="80.0" text="OK">
                <HBox.margin>
@@ -64,72 +64,6 @@
             <Insets top="10.0" />
          </padding>
       </GridPane>
-      <Accordion fx:id="addConstantAccordion" layoutY="86.0" prefHeight="100.0" prefWidth="400.0">
-         <panes>
-            <TitledPane animated="false" prefHeight="60.0" prefWidth="400.0" text="add constant">
-               <content>
-                  <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="50.0" prefWidth="388.0">
-                     <children>
-                        <GridPane layoutY="4.0" prefHeight="26.0" prefWidth="389.0">
-                           <children>
-                              <TextField fx:id="constantValueField" prefHeight="27.0" prefWidth="261.0" GridPane.columnIndex="1">
-                                 <GridPane.margin>
-                                    <Insets left="5.0" right="5.0" />
-                                 </GridPane.margin>
-                              </TextField>
-                              <ChoiceBox fx:id="constantBox" prefHeight="26.0" prefWidth="69.0">
-                                 <GridPane.margin>
-                                    <Insets left="5.0" right="5.0" />
-                                 </GridPane.margin>
-                              </ChoiceBox>
-                           </children>
-                           <columnConstraints>
-                              <ColumnConstraints hgrow="SOMETIMES" maxWidth="195.0" minWidth="10.0" prefWidth="89.0" />
-                              <ColumnConstraints hgrow="SOMETIMES" maxWidth="311.0" minWidth="10.0" percentWidth="80.0" prefWidth="311.0" />
-                           </columnConstraints>
-                           <rowConstraints>
-                              <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
-                           </rowConstraints>
-                        </GridPane>
-                     </children>
-                  </AnchorPane>
-               </content>
-               <padding>
-                  <Insets left="5.0" right="5.0" />
-               </padding>
-            </TitledPane>
-            <TitledPane animated="false" layoutX="10.0" layoutY="10.0" prefHeight="71.0" prefWidth="400.0" text="add constant">
-               <content>
-                  <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
-                     <children>
-                        <GridPane layoutY="4.0" prefHeight="26.0" prefWidth="389.0">
-                           <children>
-                              <TextField fx:id="constantValueField1" prefHeight="27.0" prefWidth="261.0" GridPane.columnIndex="1">
-                                 <GridPane.margin>
-                                    <Insets left="5.0" right="5.0" />
-                                 </GridPane.margin>
-                              </TextField>
-                              <ChoiceBox fx:id="constantBox1" prefHeight="26.0" prefWidth="69.0">
-                                 <GridPane.margin>
-                                    <Insets left="5.0" right="5.0" />
-                                 </GridPane.margin>
-                              </ChoiceBox>
-                           </children>
-                           <columnConstraints>
-                              <ColumnConstraints hgrow="SOMETIMES" maxWidth="195.0" minWidth="10.0" prefWidth="89.0" />
-                              <ColumnConstraints hgrow="SOMETIMES" maxWidth="311.0" minWidth="10.0" percentWidth="80.0" prefWidth="311.0" />
-                           </columnConstraints>
-                           <rowConstraints>
-                              <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
-                           </rowConstraints>
-                        </GridPane>
-                     </children>
-                  </AnchorPane>
-               </content>
-               <padding>
-                  <Insets left="5.0" right="5.0" />
-               </padding>
-            </TitledPane>
-         </panes></Accordion>
+      <Accordion fx:id="addConstantAccordion" layoutY="117.0" prefHeight="0.0" prefWidth="400.0" />
    </children>
 </AnchorPane>

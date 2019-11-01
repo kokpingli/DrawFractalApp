@@ -1,30 +1,30 @@
 package fractal.util;
 
 import java.util.concurrent.BlockingQueue;
-
-import fractal.model.Area;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 public class AreasConsumer implements Runnable {
-	private BlockingQueue<Area> queue;
-	private final Area poisonPill;
-	
-	public AreasConsumer(BlockingQueue<Area> queue, Area poisonPill) {
+	private BlockingQueue<RequestMessage> queue;
+
+	public AreasConsumer(BlockingQueue<RequestMessage> queue) {
 		this.queue = queue;
-		this.poisonPill = poisonPill;
 	}
-	
+
 	public void run() {
 		try {
 			while (true) {
-				Area area = queue.take();
-				if (area.equals(poisonPill)) {
-					return;
-				}
-				System.out.println(Thread.currentThread().getName() + " result: " + area.getId());
+				int N_CONSUMERS = Runtime.getRuntime().availableProcessors() * 2;
+				ExecutorService executor = Executors.newFixedThreadPool(N_CONSUMERS);
+				
+				Computation computation = new Computation(queue.take());
+
+				executor.execute(computation);
+				
 				Thread.sleep(0);
 			}
 		} catch (InterruptedException e) {
-				Thread.currentThread().interrupt();
+			Thread.currentThread().interrupt();
 		}
 	}
 }

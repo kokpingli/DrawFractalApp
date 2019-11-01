@@ -16,39 +16,28 @@ import javafx.scene.control.Alert.AlertType;
 import javafx.stage.Stage;
 
 public class VariableEditDialogController {
-	
+
 	@FXML
 	private ChoiceBox<String> functionOfBox;
 	@FXML
 	private ChoiceBox<String> iterableBox;
-	@FXML
-	private ChoiceBox<String> constantBox;
-	
-	@FXML
-	private Accordion addConstantAccordion;
-	@FXML
-	private TitledPane addConstantPane;
-	
-	@FXML
-	private TextField constantValueField;
 
 	private MainApp mainApp;
 	private Stage dialogStage;
 	private boolean okClicked = false;
 	private ObservableList<String> variableChoice = FXCollections.observableList(new ArrayList<>());
 	private ObservableList<String> constantChoice = FXCollections.observableList(new ArrayList<>());
-	
+
 	@FXML
 	private void init() {
 		mainApp.getConstantData().clear();
-		//addConstantAccordion.setExpandedPane(addConstantPane);
-		for (Variable variable: mainApp.getVariableData()) {
+		for (Variable variable : mainApp.getVariableData()) {
 			variableChoice.add(variable.getName());
 			constantChoice.add(variable.getName());
 		}
 		functionOfBox.setItems(variableChoice);
 		iterableBox.setItems(variableChoice);
-		
+
 		functionOfBox.setOnAction((event) -> {
 			constantChoice.clear();
 			constantChoice.addAll(variableChoice);
@@ -59,9 +48,8 @@ public class VariableEditDialogController {
 					if (iterableBox.getSelectionModel().getSelectedItem().equals(variable))
 						constantChoice.remove(variable);
 			}
-			constantBox.setItems(constantChoice);
 		});
-		
+
 		iterableBox.setOnAction((event) -> {
 			constantChoice.clear();
 			constantChoice.addAll(variableChoice);
@@ -72,21 +60,20 @@ public class VariableEditDialogController {
 					if (iterableBox.getSelectionModel().getSelectedItem().equals(variable))
 						constantChoice.remove(variable);
 			}
-			constantBox.setItems(constantChoice);
 		});
 	}
-		
+
 	public void setMainApp(MainApp mainApp) {
 		mainApp.getPrimaryStage().setResizable(false);
 		this.mainApp = mainApp;
 		init();
 	}
-	
+
 	public void setDialogStage(Stage dialogStage) {
 		dialogStage.setResizable(false);
-		this.dialogStage = dialogStage;		
+		this.dialogStage = dialogStage;
 	}
-	
+
 	public boolean isOKClicked() {
 		return okClicked;
 	}
@@ -95,31 +82,26 @@ public class VariableEditDialogController {
 	private void handleOK() {
 		try {
 			for (Variable variable : mainApp.getVariableData()) {
-				if (variable.getName().equals(constantBox.getSelectionModel().getSelectedItem())) {
-					variable.setConstant(true);
-					variable.setInitialValue(constantValueField.getText());
-					mainApp.getConstantData().add(variable);
-				}
 				if (variable.getName().equals(functionOfBox.getSelectionModel().getSelectedItem())) {
-					 // TODO: an indicator to show that the variable is the functionOf
+					// TODO: an indicator to show that the variable is the functionOf
 					variable.setInput(true);
 				}
 				if (variable.getName().equals(iterableBox.getSelectionModel().getSelectedItem())) {
 					variable.setIterable(true);
 				}
 			}
-		} catch(IllegalArgumentException e) {
+		} catch (IllegalArgumentException e) {
 			Alert alert = new Alert(AlertType.ERROR);
 			alert.initOwner(mainApp.getPrimaryStage());
 			alert.setTitle("Invalid Complex Number");
 			alert.setContentText(e.getMessage());
 			alert.showAndWait();
 		}
-			
+
 		okClicked = true;
 		dialogStage.close();
 	}
-	
+
 	@FXML
 	private void handleCancel() {
 		dialogStage.close();

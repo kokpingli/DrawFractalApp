@@ -1,60 +1,65 @@
 package fractal.util;
 
 import java.util.concurrent.BlockingQueue;
+import java.util.concurrent.Callable;
+import java.util.concurrent.LinkedBlockingQueue;
 
 import fractal.model.Area;
 import fractal.model.Coordinate;
 import javafx.scene.canvas.GraphicsContext;
 
-public class AreasProducer implements Runnable {
+import org.apache.log4j.Logger;
+import org.apache.log4j.BasicConfigurator;
 
-	private BlockingQueue<Area> areasQueue;
-	//private final Area poisonPill;
-	//private final int poisonPillPerProducer;
+public class AreasProducer implements Runnable {
+	final static Logger logger = Logger.getLogger(AreasProducer.class);
+	private Window window;
 	private final double height;
 	private final double width;
-	
-	//public AreasProducer(GraphicsContext gc, BlockingQueue<Area> areasQueue, Area poisonPill, int poisonPillPerProducer) {
-	public AreasProducer(GraphicsContext gc, BlockingQueue<Area> areasQueue) {
-		this.areasQueue = areasQueue;
-		//this.poisonPill = poisonPill;
-		//this.poisonPillPerProducer = poisonPillPerProducer;
-		this.height = gc.getCanvas().getHeight();
-		this.width = gc.getCanvas().getWidth();
+	private Display display;
+	private BlockingQueue<RequestMessage> requests;
+	private BlockingQueue<ResponseMessage> responses;
+
+	public AreasProducer(BlockingQueue<RequestMessage> requests, Display display, BlockingQueue<ResponseMessage> responses) {
+		this.height = display.getHeight();
+		this.width = display.getWidth();
+
+		this.display = display;
+		this.requests = requests;
+		this.responses = responses;
+		
+		int WINDOW_SIZE = 20;
+		this.window = new Window(WINDOW_SIZE, requests);
 	}
-	
+
 	public void run() {
+		BasicConfigurator.configure();
+
 		try {
 			generateAreas();
-			// prepare first 20 areas in window
-			// put these 20 areas in queue
-			// everytime any returns, add 1 more in queue (who is aware of return of computation?)
 		} catch (InterruptedException e) {
-			Thread.currentThread().interrupt();
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+
+		while (!this.requests.isEmpty() && (this.window.getNumOfElements() < this.window.getCapacity())) {
+			this.window.insertElement(this.requests.remove());
 		}
 	}
 
-	private void generateAreas() throws InterruptedException {
-		int areaHeight = 20;
-		int areaWidth = 20;
-		//int areaHeight = 2;
-		//int areaWidth = 2;
+	public void generateAreas() throws InterruptedException {
+		int areaHeight = 30;
+		int areaWidth = 30;
 		int id = 0;
-		
+
 		for (double yCoord = 0.0; yCoord < height; yCoord += areaHeight) {
 			for (double xCoord = 0.0; xCoord < width; xCoord += areaWidth) {
-		//for (double yCoord = 0.0; yCoord < 5; yCoord += areaHeight) {
-		//	for (double xCoord = 0.0; xCoord < 5; xCoord += areaWidth) {
 				Coordinate nextCoord = new Coordinate(xCoord, yCoord);
 				Area area = new Area(id, nextCoord, areaWidth, areaHeight);
-				areasQueue.put(area);
+				this.requests.put(new RequestMessage(area, display, responses));
+				Thread.sleep(50);
 				++id;
 			}
 		}
-		
-		//for (int j = 0; j < poisonPillPerProducer; ++j) {
-		//	areasQueue.put(poisonPill);
-		//}
-		
 	}
 }
