@@ -128,14 +128,14 @@ public class FractalOverviewController {
 
 		gc.clearRect(0, 0, gc.getCanvas().getWidth(), gc.getCanvas().getHeight());
 
-		double[][] numIteration = null;
-		
-		Dispatcher dispatcher = new Dispatcher(gc, equationField, mainApp, numIteration);
+		Dispatcher dispatcher = new Dispatcher(gc, equationField, mainApp.getVariableData(), 500);
 		Thread tDispatcher = new Thread(dispatcher, "Dispatcher thread");
+		tDispatcher.setDaemon(true);
 		tDispatcher.start();
 
-		beginToDraw(gc, dispatcher);
+		beginToDraw(gc, dispatcher, tDispatcher);
 	}
+
 
 	@FXML
 	private void handleDrawButton() {
@@ -146,29 +146,32 @@ public class FractalOverviewController {
 
 		gc.clearRect(0, 0, gc.getCanvas().getWidth(), gc.getCanvas().getHeight());
 
-		double[][] numIteration = null;
-		
-		Dispatcher dispatcher = new Dispatcher(gc, equationField, mainApp, numIteration);
+		Dispatcher dispatcher = new Dispatcher(gc, equationField, mainApp.getVariableData(),16*1000);
 		Thread tDispatcher = new Thread(dispatcher, "Dispatcher thread");
+		tDispatcher.setDaemon(true);
 		tDispatcher.start();
 
-		beginToDraw(gc, dispatcher);
+		beginToDraw(gc, dispatcher, tDispatcher);
 	}
 
-	private void beginToDraw(GraphicsContext gc, Dispatcher dispatcher) {
+	private void beginToDraw(GraphicsContext gc, Dispatcher dispatcher, Thread dispatcherThread) {
 		timeline = new Timeline(
-				new KeyFrame(Duration.millis(1000), ae -> drawCanvas(gc, dispatcher)));
+				new KeyFrame(Duration.millis(1000), (ae)->{
+					drawCanvas(gc,dispatcher);
+					if(!dispatcherThread.isAlive()) {
+						timeline.stop();
+						previewButton.setDisable(false);
+						drawButton.setDisable(false);
+						extractButton.setDisable(false);
+					}
+				}));
 		timeline.setCycleCount(60);
-	
-		timeline.setOnFinished(event -> {
-			extractButton.setDisable(false);
-		});
-		
 		timeline.play();
 	}
 
+
 	private void drawCanvas(GraphicsContext gc, Dispatcher dispatcher) {	
-		double[][] numIteration = dispatcher.getNumIteration();
+		double[][] numIteration = dispatcher.getData();
 
 		Coordinate beginCoord = new Coordinate(0, 0);
 		for (double xCoord = beginCoord.getX(); xCoord < gc.getCanvas().getWidth(); xCoord++) {

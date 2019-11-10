@@ -6,14 +6,12 @@ import fractal.model.Area;
 
 public class RequestMessage {
 	private Area area;
-	private RenderingParameters display;
-	private int iterations;
+	private RenderingParameters renderingParameters;
 	private BlockingQueue<ResponseMessage> responseQueue;
 	
-	RequestMessage(Area area, RenderingParameters display, int iterations, BlockingQueue<ResponseMessage> responseQueue) {
+	public RequestMessage(Area area, RenderingParameters display, BlockingQueue<ResponseMessage> responseQueue) {
 		this.area = area;
-		this.display = display;
-		this.iterations = iterations;
+		this.renderingParameters = display;
 		this.responseQueue = responseQueue;
 	}
 
@@ -21,12 +19,8 @@ public class RequestMessage {
 		return area;
 	}
 	
-	public RenderingParameters getDisplay() {
-		return display;
-	}
-
-	public int getIterations() {
-		return iterations;
+	public RenderingParameters getRenderingParameters() {
+		return renderingParameters;
 	}
 
 	public BlockingQueue<ResponseMessage> getResponseQueue() {

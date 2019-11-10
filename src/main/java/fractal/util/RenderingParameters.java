@@ -9,12 +9,14 @@ public class RenderingParameters {
 	private int height;
 	private String equation;
 	private List<Variable> variableList;
+	private int iterations;
 	
-	public RenderingParameters(int width, int height, String equation, List<Variable> variableList) {
+	public RenderingParameters(int width, int height, String equation, List<Variable> variableList, int iterations) {
 		this.width = width;
 		this.height = height;
 		this.equation = equation;
 		this.variableList = variableList;
+		this.iterations = iterations;
 	}
 	
 	public int getWidth() {
@@ -32,4 +34,6 @@ public class RenderingParameters {
 	public List<Variable> getVariableList() {
 		return variableList;
 	}
+
+	public int getIterations() { return iterations; }
 }
