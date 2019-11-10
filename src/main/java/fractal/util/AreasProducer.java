@@ -1,12 +1,9 @@
 package fractal.util;
 
 import java.util.concurrent.BlockingQueue;
-import java.util.concurrent.Callable;
-import java.util.concurrent.LinkedBlockingQueue;
 
 import fractal.model.Area;
 import fractal.model.Coordinate;
-import javafx.scene.canvas.GraphicsContext;
 
 import org.apache.log4j.Logger;
 import org.apache.log4j.BasicConfigurator;
@@ -16,11 +13,11 @@ public class AreasProducer implements Runnable {
 	private Window window;
 	private final double height;
 	private final double width;
-	private Display display;
+	private RenderingParameters display;
 	private BlockingQueue<RequestMessage> requests;
 	private BlockingQueue<ResponseMessage> responses;
 
-	public AreasProducer(BlockingQueue<RequestMessage> requests, Display display, BlockingQueue<ResponseMessage> responses) {
+	public AreasProducer(BlockingQueue<RequestMessage> requests, RenderingParameters display, BlockingQueue<ResponseMessage> responses) {
 		this.height = display.getHeight();
 		this.width = display.getWidth();
 
@@ -50,15 +47,13 @@ public class AreasProducer implements Runnable {
 	public void generateAreas() throws InterruptedException {
 		int areaHeight = 30;
 		int areaWidth = 30;
-		int id = 0;
 
 		for (double yCoord = 0.0; yCoord < height; yCoord += areaHeight) {
 			for (double xCoord = 0.0; xCoord < width; xCoord += areaWidth) {
 				Coordinate nextCoord = new Coordinate(xCoord, yCoord);
-				Area area = new Area(id, nextCoord, areaWidth, areaHeight);
-				this.requests.put(new RequestMessage(area, display, responses));
+				Area area = new Area(nextCoord, areaWidth, areaHeight);
+				this.requests.put(new RequestMessage(area, display, 16 * 1000, responses));
 				Thread.sleep(50);
-				++id;
 			}
 		}
 	}

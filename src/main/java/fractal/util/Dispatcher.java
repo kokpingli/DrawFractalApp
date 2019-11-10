@@ -1,23 +1,11 @@
 package fractal.util;
 
-import java.util.List;
 import java.util.Map;
-import java.util.Map.Entry;
 import java.util.concurrent.BlockingQueue;
-import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.Future;
-import java.util.concurrent.LinkedBlockingDeque;
 import java.util.concurrent.LinkedBlockingQueue;
-import java.util.concurrent.TimeUnit;
 
-import fractal.util.AreasConsumer;
 import fractal.MainApp;
-import fractal.model.Area;
 import fractal.model.Coordinate;
-import fractal.model.Variable;
-import fractal.util.Display;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.control.TextField;
 
@@ -29,14 +17,14 @@ public class Dispatcher implements Runnable {
 	final static Logger logger = Logger.getLogger(Dispatcher.class);
 
 	private double[][] numIteration;
-	private Display display;
+	private RenderingParameters display;
 	BlockingQueue<RequestMessage> requests;
 	BlockingQueue<ResponseMessage> responses;
 
 	public Dispatcher(GraphicsContext gc, TextField equationField, MainApp mainApp,
 			double[][] numIteration) {
 		
-		display = new Display((int)gc.getCanvas().getWidth(), (int)gc.getCanvas().getHeight(), equationField.getText().trim(), mainApp.getVariableData());
+		display = new RenderingParameters((int)gc.getCanvas().getWidth(), (int)gc.getCanvas().getHeight(), equationField.getText().trim(), mainApp.getVariableData());
 	
 		requests = new LinkedBlockingQueue<RequestMessage>();
 		responses = new LinkedBlockingQueue<ResponseMessage>();
@@ -78,9 +66,9 @@ public class Dispatcher implements Runnable {
 		while(!responses.isEmpty() && count > 0) {
 			try {
 				ResponseMessage response = responses.take();
-				Map<Coordinate, Double> iterationsMap = response.getNumIterations();
+				Map<Coordinate, Double> iterationsMap = response.getComputedValues();
 				for (Map.Entry<Coordinate, Double> entry : iterationsMap.entrySet()) {
-				    numIteration[(int)entry.getKey().getX()][(int)entry.getKey().getY()] = entry.getValue();
+				    numIteration[(int) entry.getKey().getX()][(int) entry.getKey().getY()] = entry.getValue();
 				}
 			} catch (InterruptedException e) {
 				// TODO Auto-generated catch block

@@ -13,18 +13,15 @@ public class AreasConsumer implements Runnable {
 
 	public void run() {
 		try {
-			while (true) {
-				int N_CONSUMERS = Runtime.getRuntime().availableProcessors() * 2;
-				ExecutorService executor = Executors.newFixedThreadPool(N_CONSUMERS);
-				
-				Computation computation = new Computation(queue.take());
+			int N_CONSUMERS = Runtime.getRuntime().availableProcessors() * 2;
+			ExecutorService executor = Executors.newFixedThreadPool(N_CONSUMERS);
 
+			while (true) {
+				Computation computation = new Computation(queue.take());
 				executor.execute(computation);
-				
-				Thread.sleep(0);
 			}
 		} catch (InterruptedException e) {
-			Thread.currentThread().interrupt();
+			throw new RuntimeException(e);
 		}
 	}
 }

@@ -5,13 +5,13 @@ import java.util.Map;
 import fractal.model.Coordinate;
 
 public class ResponseMessage {
-	private Map<Coordinate, Double> numIterations;
+	private Map<Coordinate, Double> computedValues;
 	
 	ResponseMessage(Map<Coordinate, Double> numIterations) {
-		this.numIterations = numIterations;
+		this.computedValues = numIterations;
 	}
 	
-	public Map<Coordinate, Double> getNumIterations() {
-		return numIterations;
+	public Map<Coordinate, Double> getComputedValues() {
+		return computedValues;
 	}
 }

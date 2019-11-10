@@ -1,10 +1,9 @@
 package fractal.util;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.BlockingQueue;
-import java.util.function.Supplier;
 
 import fractal.model.Area;
 import fractal.model.BinaryNode;
@@ -15,18 +14,29 @@ import javafx.util.Pair;
 
 public class Computation implements Runnable {
 	
-	private Area area;
-	private Display display;
-	private BlockingQueue<ResponseMessage> responseQueue;
-	
+	private RequestMessage request;
+
 	public Computation(RequestMessage request) {
-		this.area = request.getArea();
-		this.display = request.getDisplay();
-		this.responseQueue = request.getResponseQueue();
+		this.request = request;
 	}
 
-	private Pair<Coordinate, Double> computeIteration(long maxIteration, String equation, List<Variable> variableList,
-			Coordinate current) {
+	private List<Coordinate> getCoordinates(Area area) {
+		List<Coordinate> coordList = new ArrayList<>(area.getWidth() * area.getHeight());
+		double x = area.getTopLeft().getX();
+		double y = area.getTopLeft().getY();
+
+		for (double xCoord = x; xCoord < x + area.getWidth(); ++xCoord) {
+			for (double yCoord = y; yCoord < y + area.getHeight(); ++yCoord) {
+				Coordinate coord = new Coordinate(xCoord, yCoord);
+				coordList.add(coord);
+			}
+		}
+
+		return coordList;
+	}
+
+	private Double computeSingleElement(long maxIteration, String equation, List<Variable> variableList,
+														  Coordinate current) {
 		Map<String, ComplexNumber> variables = new HashMap<>();
 
 		double iteration = 0;
@@ -37,7 +47,7 @@ public class Computation implements Runnable {
 			}
 			if (variable.isIterable()) {
 				variables.put(variable.getName(),
-						new ComplexNumber(current.getX() * 2 / display.getWidth() - 1, current.getY() * (-2) / display.getHeight() + 1));
+						new ComplexNumber(current.getX() * 2 / request.getDisplay().getWidth() - 1, current.getY() * (-2) / request.getDisplay().getHeight() + 1));
 			} else {
 				// for constant?
 				variables.put(variable.getName(), variable.getComplexNumber());
@@ -60,24 +70,21 @@ public class Computation implements Runnable {
 			iteration = (iteration + 1.0) - nu;
 		}
 
-		Pair<Coordinate, Double> reply = new Pair<>(current, iteration);
-
-		return reply;
+		return iteration;
 	}
 
 	@Override
 	public void run() {
 		HashMap<Coordinate, Double> areaIteration = new HashMap<>();
 
-		List<Coordinate> coordinates = area.getCoordinates();
+		List<Coordinate> coordinates = getCoordinates(request.getArea());
 
 		for (Coordinate coordinate : coordinates) {
-			Pair<Coordinate, Double> reply = computeIteration(display.MAX_ITERATION, display.getEquation(), display.getVariableList(), coordinate);
-			areaIteration.put(reply.getKey(), reply.getValue());
+			double value = computeSingleElement(request.getIterations(), request.getDisplay().getEquation(), request.getDisplay().getVariableList(), coordinate);
+			areaIteration.put(coordinate, value);
 		}
 		
-		responseQueue.add(new ResponseMessage(areaIteration));
-		System.out.println("responseQueue: " + responseQueue.size());
+		request.getResponseQueue().add(new ResponseMessage(areaIteration));
 	}
 
 }

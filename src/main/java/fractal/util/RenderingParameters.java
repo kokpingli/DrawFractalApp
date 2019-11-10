@@ -4,16 +4,13 @@ import java.util.List;
 
 import fractal.model.Variable;
 
-public class Display {
-	
-	public static final int MAX_ITERATION = 16 * 1000;
-	
+public class RenderingParameters {
 	private int width;
 	private int height;
 	private String equation;
 	private List<Variable> variableList;
 	
-	public Display(int width, int height, String equation, List<Variable> variableList) {
+	public RenderingParameters(int width, int height, String equation, List<Variable> variableList) {
 		this.width = width;
 		this.height = height;
 		this.equation = equation;
