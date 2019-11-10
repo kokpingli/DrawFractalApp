@@ -21,7 +21,6 @@
                     </HBox.margin>
                 </Button>
             </HBox>
-            <HBox prefHeight="44.0" prefWidth="249.0"/>
             <SplitPane dividerPositions="0.5" layoutX="5.0" layoutY="203.0" prefHeight="87.0" prefWidth="259.0"
                        AnchorPane.bottomAnchor="10.0" AnchorPane.leftAnchor="10.0" AnchorPane.rightAnchor="10.0">
                 <Canvas fx:id="previewCanvas" height="90.0" width="90.0"/>

@@ -1,5 +1,6 @@
 package fractal.util;
 
+import java.util.HashMap;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -20,7 +21,13 @@ public class WorkerPool {
 					try {
 						RequestMessage request = queue.poll(10, TimeUnit.MILLISECONDS);
 						if(request != null) {
-							request.getResponseQueue().add(new ResponseMessage(computer.computeArea(request.getArea(), request.getRenderingParameters())));
+							BlockingQueue<ResponseMessage> responseQueue = request.getResponseQueue();
+							try {
+								responseQueue.add(new ResponseMessage(computer.computeArea(request.getArea(), request.getRenderingParameters())));
+							} catch(Throwable th) {
+								responseQueue.add(new ResponseMessage(new HashMap<>()));
+								th.printStackTrace();
+							}
 						}
 					} catch (InterruptedException ex) {
 						throw new RuntimeException(ex);
