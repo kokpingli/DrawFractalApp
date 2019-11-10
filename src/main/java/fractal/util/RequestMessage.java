@@ -5,9 +5,9 @@ import java.util.concurrent.BlockingQueue;
 import fractal.model.Area;
 
 public class RequestMessage {
-	private Area area;
-	private RenderingParameters renderingParameters;
-	private BlockingQueue<ResponseMessage> responseQueue;
+	private final Area area;
+	private final RenderingParameters renderingParameters;
+	private final BlockingQueue<ResponseMessage> responseQueue;
 	
 	public RequestMessage(Area area, RenderingParameters display, BlockingQueue<ResponseMessage> responseQueue) {
 		this.area = area;

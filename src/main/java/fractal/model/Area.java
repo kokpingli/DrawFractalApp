@@ -1,12 +1,9 @@
 package fractal.model;
 
-import java.util.ArrayList;
-import java.util.List;
-
 public class Area {
-	private Coordinate topLeft;
-	private int width;
-	private int height;
+	private final Coordinate topLeft;
+	private final int width;
+	private final int height;
 
 	public Area(Coordinate start, int width, int height) {
 		this.topLeft = start;

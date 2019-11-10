@@ -53,7 +53,7 @@ public class StringOperations {
 
 	private static boolean isOperator(String exp) {
 		String opRegex = "^[+\\-*/%]$";
-		return exp.matches(opRegex) ? true : false;
+		return exp.matches(opRegex);
 	}
 
 	private static BinaryNode<String> buildTree(List<String> postfixExp) {
@@ -61,9 +61,9 @@ public class StringOperations {
 
 		for (String str : postfixExp) {
 			if (!isOperator(str)) {
-				treeInProgress.push(new BinaryNode<String>(str));
+				treeInProgress.push(new BinaryNode<>(str));
 			} else {
-				BinaryNode<String> root = new BinaryNode<String>(str);
+				BinaryNode<String> root = new BinaryNode<>(str);
 				root.setRight(treeInProgress.pop());
 				root.setLeft(treeInProgress.pop());
 				treeInProgress.push(root);
@@ -131,11 +131,9 @@ public class StringOperations {
 			if (StringUtils.countMatches(exp, "(") != StringUtils.countMatches(exp, ")"))
 				throw new IllegalArgumentException("Unbalanced parentheses!");
 		} else {
-			StringBuilder addBracket = new StringBuilder();
-			addBracket.append("(");
-			addBracket.append(exp);
-			addBracket.append(")");
-			exp = addBracket.toString();
+			exp = "(" +
+					exp +
+					")";
 		}
 
 		return exp;
@@ -149,14 +147,14 @@ public class StringOperations {
 		infix = validateBalancedParentheses(infix);
 
 		Stack<String> expBuilder = new Stack<>();
-		List<String> postfixExp = new ArrayList<>();
+		List<String> postfixExp;
 
 		for (int idx = 0; idx < infix.length(); idx++) {
 			ArrayList<String> strInProgress = new ArrayList<>();
 			if (!infix.substring(idx, idx + 1).equals(")")) {
 				expBuilder.push(infix.substring(idx, idx + 1));
 			} else {
-				String element = "";
+				String element;
 				do {
 					element = expBuilder.pop();
 					if (!element.equals("("))
@@ -167,17 +165,17 @@ public class StringOperations {
 				postfixExp = postfix(strInProgress);
 
 				StringBuilder sb = new StringBuilder();
-				for (String s : postfixExp)
-					sb.append(s + " ");
+				for (String s : postfixExp) {
+					sb.append(s);
+					sb.append(" ");
+				}
 				expBuilder.push(sb.toString());
 			}
 		}
 
 		postfixExp = Arrays.asList(expBuilder.pop().split("[ ]+"));
 
-		BinaryNode<String> root = buildTree(postfixExp);
-
-		return root;
+		return buildTree(postfixExp);
 	}
 
 }

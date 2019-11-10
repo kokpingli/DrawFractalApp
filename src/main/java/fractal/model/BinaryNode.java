@@ -3,7 +3,7 @@ package fractal.model;
 public class BinaryNode<V extends Comparable<V>> {
 	private BinaryNode<V> left;
 	private BinaryNode<V> right;
-	private V value;
+	private final V value;
 
 	public BinaryNode(V value) {
 		this.value = value;
@@ -31,11 +31,8 @@ public class BinaryNode<V extends Comparable<V>> {
 		this.right = right;
 	}
 
-	boolean isOperator() {
-		if (this.value.equals("+") || this.value.equals("-") || this.value.equals("*") || this.value.equals("/")
-				|| this.value.equals("%"))
-			return true;
-		else
-			return false;
+	public boolean isOperator() {
+		return this.value.equals("+") || this.value.equals("-") || this.value.equals("*") || this.value.equals("/")
+				|| this.value.equals("%");
 	}
 }

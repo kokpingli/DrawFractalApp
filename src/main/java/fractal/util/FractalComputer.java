@@ -15,11 +15,11 @@ public class FractalComputer {
 
 	private List<Coordinate> getCoordinates(Area area) {
 		List<Coordinate> coordList = new ArrayList<>(area.getWidth() * area.getHeight());
-		double x = area.getTopLeft().getX();
-		double y = area.getTopLeft().getY();
+		int x = area.getTopLeft().getX();
+		int y = area.getTopLeft().getY();
 
-		for (double xCoord = x; xCoord < x + area.getWidth(); ++xCoord) {
-			for (double yCoord = y; yCoord < y + area.getHeight(); ++yCoord) {
+		for (int xCoord = x; xCoord < x + area.getWidth(); ++xCoord) {
+			for (int yCoord = y; yCoord < y + area.getHeight(); ++yCoord) {
 				Coordinate coord = new Coordinate(xCoord, yCoord);
 				coordList.add(coord);
 			}
@@ -39,7 +39,7 @@ public class FractalComputer {
 			}
 			if (variable.isIterable()) {
 				variables.put(variable.getName(),
-						new ComplexNumber(location.getX() * 2 / parameters.getWidth() - 1, location.getY() * (-2) / parameters.getHeight() + 1));
+						new ComplexNumber(location.getX() * 2.0 / parameters.getWidth() - 1, location.getY() * (-2.0) / parameters.getHeight() + 1));
 			} else {
 				// for constant?
 				variables.put(variable.getName(), variable.getComplexNumber());

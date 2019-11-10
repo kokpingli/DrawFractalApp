@@ -1,7 +1,5 @@
 package fractal.view;
 
-import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedHashSet;
 import java.util.Set;
@@ -14,7 +12,6 @@ import fractal.util.StringUtil;
 import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
 import javafx.collections.FXCollections;
-import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
@@ -44,9 +41,7 @@ public class FractalOverviewController {
 	private MainApp mainApp;
 	private Timeline timeline;
 
-	private Color[] palette = new Color[256 * 256 * 256];
-	
-	private ObservableList<String> variableChoice = FXCollections.observableList(new ArrayList<>());
+	private final Color[] palette = new Color[256 * 256 * 256];
 
 	private void init() {
 		Set<String[]> hexPalette = new LinkedHashSet<>();
@@ -100,12 +95,11 @@ public class FractalOverviewController {
 			if (equationField.getText().length() == 0)
 				throw new IllegalArgumentException("No variable to be extracted!");
 
-			Set<Variable> variablesSet = new HashSet<>();
-			variablesSet = StringUtil.extractVariables(equationField.getText());
+			Set<Variable> variablesSet = StringUtil.extractVariables(equationField.getText());
 
 			mainApp.setVariableData(FXCollections.observableArrayList(variablesSet));
 
-			boolean okClicked = mainApp.showVariableEditDialog();
+			mainApp.showVariableEditDialog();
 			
 			previewButton.setDisable(false);
 			drawButton.setDisable(false);

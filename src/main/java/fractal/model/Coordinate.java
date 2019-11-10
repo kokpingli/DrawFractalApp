@@ -1,19 +1,19 @@
 package fractal.model;
 
 public class Coordinate {
-	private double x;
-	private double y;
+	private final int x;
+	private final int y;
 
-	public Coordinate(double x, double y) {
+	public Coordinate(int x, int y) {
 		this.x = x;
 		this.y = y;
 	}
 
-	public double getX() {
+	public int getX() {
 		return x;
 	}
 
-	public double getY() {
+	public int getY() {
 		return y;
 	}
 }

@@ -5,7 +5,7 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 public class WorkerPool {
-	private AtomicBoolean terminated;
+	private final AtomicBoolean terminated;
 
 	public WorkerPool(BlockingQueue<RequestMessage> queue) {
 		FractalComputer computer = new FractalComputer();

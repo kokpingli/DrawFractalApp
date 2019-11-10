@@ -10,12 +10,12 @@ public class StringUtil {
 
 	private static boolean isValidEquation(String str) {
 		String regex = "^[0-9a-zA-Z+\\-*/%().]$";
-		return str.matches(regex) ? true : false;
+		return str.matches(regex);
 	}
 
 	private static boolean isValidComplexNumber(String str) {
 		String regex = "([-]?\\d*\\.?\\d*?[+-]?\\d*\\.?\\d*?[ij]?)";
-		return str.matches(regex) ? true : false;
+		return str.matches(regex);
 	}
 
 	public static Set<Variable> extractVariables(String str) {
@@ -41,7 +41,7 @@ public class StringUtil {
 		if (!isValidComplexNumber(str))
 			throw new IllegalArgumentException("Please enter a valid complex number!");
 
-		int opIndex = 0;
+		int opIndex;
 		if (str.startsWith("-")) {
 			opIndex = Math.max(str.indexOf("+", 1), str.indexOf("-", 1));
 		} else {
@@ -54,7 +54,7 @@ public class StringUtil {
 			int withoutOne = 2;
 			String imaginaryPart = str.substring(opIndex, str.length() - 1);
 			if (str.length() - opIndex == withoutOne) {
-				imaginaryPart = str.substring(opIndex, str.length() - 1) + "1";
+				imaginaryPart = imaginaryPart + "1";
 			}
 			return new ComplexNumber(Double.parseDouble(str.substring(0, opIndex)), Double.parseDouble(imaginaryPart));
 		}

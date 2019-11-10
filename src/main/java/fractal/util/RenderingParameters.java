@@ -5,11 +5,11 @@ import java.util.List;
 import fractal.model.Variable;
 
 public class RenderingParameters {
-	private int width;
-	private int height;
-	private String equation;
-	private List<Variable> variableList;
-	private int iterations;
+	private final int width;
+	private final int height;
+	private final String equation;
+	private final List<Variable> variableList;
+	private final int iterations;
 	
 	public RenderingParameters(int width, int height, String equation, List<Variable> variableList, int iterations) {
 		this.width = width;

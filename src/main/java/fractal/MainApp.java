@@ -40,7 +40,7 @@ public class MainApp extends Application {
 		try {
 			FXMLLoader loader = new FXMLLoader();
 			loader.setLocation(MainApp.class.getResource("../FractalOverview.fxml"));
-			AnchorPane fractalOverview = (AnchorPane) loader.load();
+			AnchorPane fractalOverview = loader.load();
 
 			FractalOverviewController controller = loader.getController();
 			controller.setMainApp(this);
@@ -54,11 +54,11 @@ public class MainApp extends Application {
 		}
 	}
 
-	public boolean showVariableEditDialog() {
+	public void showVariableEditDialog() {
 		try {
 			FXMLLoader loader = new FXMLLoader();
 			loader.setLocation(MainApp.class.getResource("../VariableEditDialog.fxml"));
-			AnchorPane page = (AnchorPane) loader.load();
+			AnchorPane page = loader.load();
 
 			Stage dialogStage = new Stage();
 			dialogStage.setTitle("Edit Variable");
@@ -72,11 +72,8 @@ public class MainApp extends Application {
 			controller.setDialogStage(dialogStage);
 
 			dialogStage.showAndWait();
-
-			return controller.isOKClicked();
 		} catch (IOException e) {
 			e.printStackTrace();
-			return false;
 		}
 
 	}

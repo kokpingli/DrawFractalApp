@@ -5,7 +5,7 @@ import java.util.Map;
 import fractal.model.Coordinate;
 
 public class ResponseMessage {
-	private Map<Coordinate, Double> computedValues;
+	private final Map<Coordinate, Double> computedValues;
 	
 	public ResponseMessage(Map<Coordinate, Double> numIterations) {
 		this.computedValues = numIterations;

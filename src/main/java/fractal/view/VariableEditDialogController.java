@@ -7,11 +7,8 @@ import fractal.model.Variable;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
-import javafx.scene.control.Accordion;
 import javafx.scene.control.Alert;
 import javafx.scene.control.ChoiceBox;
-import javafx.scene.control.TextField;
-import javafx.scene.control.TitledPane;
 import javafx.scene.control.Alert.AlertType;
 import javafx.stage.Stage;
 
@@ -25,8 +22,8 @@ public class VariableEditDialogController {
 	private MainApp mainApp;
 	private Stage dialogStage;
 	private boolean okClicked = false;
-	private ObservableList<String> variableChoice = FXCollections.observableList(new ArrayList<>());
-	private ObservableList<String> constantChoice = FXCollections.observableList(new ArrayList<>());
+	private final ObservableList<String> variableChoice = FXCollections.observableList(new ArrayList<>());
+	private final ObservableList<String> constantChoice = FXCollections.observableList(new ArrayList<>());
 
 	@FXML
 	private void init() {

@@ -26,11 +26,7 @@ public class Variable {
 	private StringProperty initialValue;
 
 	public void setInitialValue(String value) {
-		try {
-			setComplexNumber(value);
-		} catch (IllegalArgumentException e) {
-			throw e;
-		}
+		setComplexNumber(value);
 		initialValueProperty().set(value);
 	}
 
@@ -95,11 +91,7 @@ public class Variable {
 	private ComplexNumber initialValueComplex;
 
 	private void setComplexNumber(String initialValue) {
-		try {
-			initialValueComplex = StringUtil.toComplexNumber(initialValue);
-		} catch (IllegalArgumentException e) {
-			throw e;
-		}
+		initialValueComplex = StringUtil.toComplexNumber(initialValue);
 	}
 
 	public ComplexNumber getComplexNumber() {
