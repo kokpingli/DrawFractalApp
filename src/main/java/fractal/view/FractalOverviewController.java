@@ -3,11 +3,14 @@ package fractal.view;
 import java.util.Iterator;
 import java.util.LinkedHashSet;
 import java.util.Set;
+import java.util.concurrent.BlockingQueue;
+import java.util.concurrent.LinkedBlockingQueue;
 
 import fractal.MainApp;
 import fractal.util.Dispatcher;
 import fractal.model.Coordinate;
 import fractal.model.Variable;
+import fractal.util.RendererVersion;
 import fractal.util.StringUtil;
 import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
@@ -85,10 +88,6 @@ public class FractalOverviewController {
 		init();
 	}
 
-	public String getEquation() {
-		return equationField.getText().trim();
-	}
-
 	@FXML
 	private void handleExtractEquation() {
 		try {
@@ -122,12 +121,13 @@ public class FractalOverviewController {
 
 		gc.clearRect(0, 0, gc.getCanvas().getWidth(), gc.getCanvas().getHeight());
 
-		Dispatcher dispatcher = new Dispatcher(gc, equationField, mainApp.getVariableData(), 500);
+		BlockingQueue<RendererVersion> renderingQueue = new LinkedBlockingQueue<>();
+		Dispatcher dispatcher = new Dispatcher(gc, equationField, mainApp.getVariableData(), 500, renderingQueue);
 		Thread tDispatcher = new Thread(dispatcher, "Dispatcher thread");
 		tDispatcher.setDaemon(true);
 		tDispatcher.start();
 
-		beginToDraw(gc, dispatcher, tDispatcher);
+		beginToDraw(gc, renderingQueue, tDispatcher);
 	}
 
 
@@ -140,18 +140,23 @@ public class FractalOverviewController {
 
 		gc.clearRect(0, 0, gc.getCanvas().getWidth(), gc.getCanvas().getHeight());
 
-		Dispatcher dispatcher = new Dispatcher(gc, equationField, mainApp.getVariableData(),16*1000);
+		BlockingQueue<RendererVersion> renderingQueue = new LinkedBlockingQueue<>();
+		Dispatcher dispatcher = new Dispatcher(gc, equationField, mainApp.getVariableData(),16*1000, renderingQueue);
 		Thread tDispatcher = new Thread(dispatcher, "Dispatcher thread");
 		tDispatcher.setDaemon(true);
 		tDispatcher.start();
 
-		beginToDraw(gc, dispatcher, tDispatcher);
+		beginToDraw(gc, renderingQueue, tDispatcher);
 	}
 
-	private void beginToDraw(GraphicsContext gc, Dispatcher dispatcher, Thread dispatcherThread) {
+	private void beginToDraw(GraphicsContext gc, BlockingQueue<RendererVersion> renderingQueue, Thread dispatcherThread) {
 		timeline = new Timeline(
 				new KeyFrame(Duration.millis(1000), (ae)->{
-					drawCanvas(gc,dispatcher);
+					try {
+						drawCanvas(gc, renderingQueue);
+					} catch (InterruptedException ex) {
+						throw new RuntimeException(ex);
+					}
 					if(!dispatcherThread.isAlive()) {
 						timeline.stop();
 						previewButton.setDisable(false);
@@ -163,9 +168,8 @@ public class FractalOverviewController {
 		timeline.play();
 	}
 
-
-	private void drawCanvas(GraphicsContext gc, Dispatcher dispatcher) {	
-		double[][] numIteration = dispatcher.getData();
+	private void drawCanvas(GraphicsContext gc, BlockingQueue<RendererVersion> renderingQueue) throws InterruptedException {
+		double[][] numIteration = renderingQueue.take().data();
 
 		Coordinate beginCoord = new Coordinate(0, 0);
 		for (double xCoord = beginCoord.getX(); xCoord < gc.getCanvas().getWidth(); xCoord++) {

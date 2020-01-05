@@ -17,15 +17,17 @@ public class Dispatcher implements Runnable {
 	private final RenderingParameters parameters;
 	private final BlockingQueue<RequestMessage> requests;
 	private final BlockingQueue<ResponseMessage> responses;
+	private final BlockingQueue<RendererVersion> renderingQueue;
 
-	public Dispatcher(GraphicsContext gc, TextField equationField, List<Variable> variables, int iterations) {
-		
+	public Dispatcher(GraphicsContext gc, TextField equationField, List<Variable> variables, int iterations, BlockingQueue<RendererVersion> renderingQueue) {
+
 		this.parameters = new RenderingParameters((int)gc.getCanvas().getWidth(), (int)gc.getCanvas().getHeight(), equationField.getText().trim(), variables, iterations);
 	
 		this.requests = new LinkedBlockingQueue<>();
 		this.responses = new LinkedBlockingQueue<>();
 
 		this.data = new double[parameters.getWidth()][parameters.getHeight()];
+		this.renderingQueue = renderingQueue;
 	}
 
 	@Override
@@ -46,6 +48,7 @@ public class Dispatcher implements Runnable {
 				}
 			}
 
+			Renderer renderer = new Renderer();
 			//Step 2: collate all the responses back
 			while(pendingResponse > 0) {
 				ResponseMessage response = responses.take();
@@ -53,6 +56,8 @@ public class Dispatcher implements Runnable {
 				for (Map.Entry<Coordinate, Double> entry : iterationsMap.entrySet()) {
 					data[entry.getKey().getX()][entry.getKey().getY()] = entry.getValue();
 				}
+				renderer.setData(data);
+				renderingQueue.put(renderer.getWorkingCopy());
 
 				pendingResponse--;
 			}
@@ -62,9 +67,5 @@ public class Dispatcher implements Runnable {
 			pool.shutdown();
 		}
 
-	}
-	
-	public double[][] getData() {
-		return data;
 	}
 }

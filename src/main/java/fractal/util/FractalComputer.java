@@ -28,7 +28,7 @@ public class FractalComputer {
 		return coordList;
 	}
 
-	private Double computeSingleElement(RenderingParameters parameters, Coordinate location) {
+	private Double computeSingleElement(BinaryNode<String> root, RenderingParameters parameters, Coordinate location) {
 		Map<String, ComplexNumber> variables = new HashMap<>();
 
 		double iteration = 0;
@@ -45,8 +45,6 @@ public class FractalComputer {
 				variables.put(variable.getName(), variable.getComplexNumber());
 			}
 		}
-
-		BinaryNode<String> root = StringOperations.evaluate(parameters.getEquation(), variables);
 
 		ComplexNumber result = StringOperations.evaluateTree(root, variables);
 
@@ -71,8 +69,10 @@ public class FractalComputer {
 
 		List<Coordinate> coordinates = getCoordinates(area);
 
+		BinaryNode<String> root = StringOperations.evaluate(parameters.getEquation());
+
 		for (Coordinate coordinate : coordinates) {
-			double value = computeSingleElement(parameters, coordinate);
+			double value = computeSingleElement(root, parameters, coordinate);
 			areaIteration.put(coordinate, value);
 		}
 

@@ -139,7 +139,7 @@ public class StringOperations {
 		return exp;
 	}
 
-	public static BinaryNode<String> evaluate(String infix, Map<String, ComplexNumber> variables) {
+	public static BinaryNode<String> evaluate(String infix) {
 		String regex = "^[a-zA-Z0-9+\\-*/%().]+$";
 		if (!infix.matches(regex) && infix.length() > 0)
 			throw new IllegalArgumentException("Only equation is allowed!");
